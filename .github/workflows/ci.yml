@@ -1,0 +1,13 @@
+name: CI
+
+on:
+  pull_request:
+    types: [ opened, edited, reopened, synchronize, ready_for_review ]
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Lint
+        run: make lint
