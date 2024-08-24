@@ -1,0 +1,8 @@
+.env
+build/
+.vscode/
+bin
+tmp
+.idea
+docs/
+./main.go
