@@ -39,7 +39,7 @@ func main() {
 	// registering commands
 	root := registerCommands(ctx)
 
-	err := root.ExecuteContext(ctx)
+	err := root.Execute()
 	if err != nil {
 		return
 	}
