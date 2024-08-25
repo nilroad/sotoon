@@ -16,7 +16,7 @@ func (r *Command) Register(ctx context.Context) *cobra.Command {
 		Short: "Say hello",
 		Args:  cobra.MaximumNArgs(1),
 
-		Run: func(cmd *cobra.Command, args []string) {
+		Run: func(_ *cobra.Command, args []string) {
 			if len(args) == 0 {
 				r.name = "sotoon"
 			} else {
