@@ -24,8 +24,36 @@ SOFTWARE.
 
 package main
 
-import "fmt"
+import (
+	"context"
+	"github.com/spf13/cobra"
+	"os/signal"
+	"sotoon/cmd/hello"
+	"syscall"
+)
 
 func main() {
-	fmt.Println("Hello Sotoon")
+	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer cancel()
+
+	// registering commands
+	root := registerCommands(ctx)
+
+	err := root.Execute()
+	if err != nil {
+		return
+	}
+}
+
+// registerCommands all commands register in this function
+func registerCommands(ctx context.Context) *cobra.Command {
+	root := &cobra.Command{}
+
+	helloCMD := &hello.Command{}
+
+	root.AddCommand(
+		helloCMD.Register(ctx),
+	)
+
+	return root
 }
