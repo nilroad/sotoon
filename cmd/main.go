@@ -26,9 +26,11 @@ package main
 
 import (
 	"context"
+	"github.com/nilroad/kateb"
 	"github.com/spf13/cobra"
 	"os/signal"
-	"sotoon/cmd/hello"
+	"sotoon/cmd/http"
+	"sotoon/internal/config"
 	"syscall"
 )
 
@@ -36,23 +38,30 @@ func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
 
-	// registering commands
-	root := registerCommands(ctx)
+	cfg, err := config.Load()
+	if err != nil {
+		kateb.Fatal("failed to load config", map[string]any{
+			"err": err,
+		})
+	}
 
-	err := root.Execute()
+	// registering commands
+	root := registerCommands(ctx, cfg)
+
+	err = root.Execute()
 	if err != nil {
 		return
 	}
 }
 
 // registerCommands all commands register in this function
-func registerCommands(ctx context.Context) *cobra.Command {
+func registerCommands(ctx context.Context, cfg *config.Config) *cobra.Command {
 	root := &cobra.Command{}
 
-	helloCMD := &hello.Command{}
+	HTTPCmd := new(http.Command)
 
 	root.AddCommand(
-		helloCMD.Register(ctx),
+		HTTPCmd.Register(ctx, cfg),
 	)
 
 	return root

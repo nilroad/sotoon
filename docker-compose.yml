@@ -8,9 +8,9 @@ services:
       - ${MYSQL_LOCAL_PORT:-3306}:3306
     environment:
       - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=${DATABASE_MYSQL_NAME:-nilroad}
-      - MYSQL_USER=${DATABASE_MYSQL_USER:-nilroad}
-      - MYSQL_PASSWORD=${DATABASE_MYSQL_PASSWORD:-nilroad}
+      - MYSQL_DATABASE=${DATABASE_MYSQL_NAME:-sotoon}
+      - MYSQL_USER=${DATABASE_MYSQL_USERNAME:-sotoon}
+      - MYSQL_PASSWORD=${DATABASE_MYSQL_PASSWORD:-sotoon}
     volumes:
       - mysql-data:/var/lib/mysql
     extra_hosts:
