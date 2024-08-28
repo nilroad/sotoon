@@ -28,7 +28,14 @@ func (r *Command) Register(ctx context.Context, cfg *config.Config) *cobra.Comma
 }
 
 func (r *Command) run(ctx context.Context, cfg *config.Config) {
-	db := mysql.New(cfg.MYSQLConfig, cfg.Debug)
+	db, err := mysql.New(cfg.MYSQLConfig, cfg.Debug)
+	if err != nil {
+		r.logger.Error("failed to init db", map[string]interface{}{
+			"err": err,
+		})
+
+		return
+	}
 	defer func() {
 		if err := db.Close(); err != nil {
 			r.logger.Error("failed to close db connection", nil)

@@ -18,7 +18,7 @@ type SQLDb struct {
 	sqlDB  *sql.DB
 }
 
-func New(cfg config.MYSQLConfig, debug bool) *SQLDb {
+func New(cfg config.MYSQLConfig, debug bool) (*SQLDb, error) {
 	loc, err := time.LoadLocation(cfg.Tz)
 	if err != nil {
 		panic(err)
@@ -38,7 +38,7 @@ func New(cfg config.MYSQLConfig, debug bool) *SQLDb {
 	}
 	sqlDB, err := sql.Open("mysql", c.FormatDSN())
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	gormCfg := gorm.Config{}
@@ -50,21 +50,20 @@ func New(cfg config.MYSQLConfig, debug bool) *SQLDb {
 	gormDB, err := gorm.Open(gormmysql.New(gormmysql.Config{
 		Conn: sqlDB,
 	}), &gormCfg)
-
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	return &SQLDb{
 		db:     gormDB,
 		config: cfg,
 		sqlDB:  sqlDB,
-	}
+	}, nil
 }
 
 func (r *SQLDb) DB(ctx context.Context) *gorm.DB {
 	db, ok := ctx.Value(r.config.Name).(*SQLDb)
-	if !ok {
+	if ok {
 		return db.db
 	}
 

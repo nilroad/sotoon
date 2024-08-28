@@ -2,6 +2,7 @@ package dbmanager
 
 import (
 	"context"
+	"fmt"
 	"github.com/nilroad/kateb"
 )
 
@@ -23,7 +24,9 @@ func (r *TrxManager) Do(ctx context.Context, fn func(ctx context.Context) error)
 	d, err := r.Begin()
 	db, ok := d.(DB)
 	if !ok {
-		panic("implement SQLDb interface")
+		r.logger.Error("implement db interface", nil)
+
+		return fmt.Errorf("implement db interface")
 	}
 
 	if err != nil {
