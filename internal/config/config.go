@@ -2,6 +2,7 @@ package config
 
 type Config struct {
 	Debug       bool
+	Tz          string
 	LogLevel    string
 	HTTPServer  HTTPServer
 	MYSQLConfig MYSQLConfig
@@ -15,9 +16,8 @@ type HTTPServer struct {
 type MYSQLConfig struct {
 	Name     string
 	Host     string
-	Port     int
 	Username string
 	Password string
 	Database string
-	Tz       string
+	Port     int
 }
