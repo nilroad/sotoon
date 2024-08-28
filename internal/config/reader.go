@@ -21,6 +21,7 @@ func Load() (*Config, error) {
 
 	return &Config{
 		Debug:    loadBool("DEBUG"),
+		Tz:       loadString("TZ"),
 		LogLevel: loadString("LOG_LEVEL"),
 		HTTPServer: HTTPServer{
 			Host: loadString("HTTP_HOST"),
@@ -33,7 +34,6 @@ func Load() (*Config, error) {
 			Username: loadString("MYSQL_DATABASE_USERNAME"),
 			Password: loadString("MYSQL_DATABASE_PASSWORD"),
 			Database: loadString("MYSQL_DATABASE_NAME"),
-			Tz:       loadString("TZ"),
 		},
 	}, nil
 }

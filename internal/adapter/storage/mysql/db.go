@@ -18,8 +18,8 @@ type SQLDb struct {
 	sqlDB  *sql.DB
 }
 
-func New(cfg config.MYSQLConfig, debug bool) (*SQLDb, error) {
-	loc, err := time.LoadLocation(cfg.Tz)
+func New(cfg config.MYSQLConfig, timezone string, debug bool) (*SQLDb, error) {
+	loc, err := time.LoadLocation(timezone)
 	if err != nil {
 		panic(err)
 	}
@@ -35,6 +35,9 @@ func New(cfg config.MYSQLConfig, debug bool) (*SQLDb, error) {
 		ParseTime:               true,
 		MultiStatements:         true,
 		Loc:                     loc,
+		Params: map[string]string{
+			"time_zone": "'" + timezone + "'",
+		},
 	}
 	sqlDB, err := sql.Open("mysql", c.FormatDSN())
 	if err != nil {
