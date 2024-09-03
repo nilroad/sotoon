@@ -14,10 +14,17 @@ import (
 )
 
 type Command struct {
-	logger kateb.Logger
+	logger *kateb.Logger
 }
 
 func (r *Command) Register(ctx context.Context, cfg *config.Config) *cobra.Command {
+	r.logger = kateb.New(os.Stdout, kateb.Config{
+		Level:     kateb.ConvertToLevel(cfg.LogLevel),
+		AddSource: false,
+		Prefix:    "sotoon:cmd:server",
+		Colorize:  false,
+	})
+
 	return &cobra.Command{
 		Use:   "server",
 		Short: "run http server",

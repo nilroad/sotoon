@@ -81,7 +81,7 @@ purge:
 	$(COMPOSE_COMMAND) -f $(COMPOSE_FILES) down --remove-orphans --volumes $(RUN_ARGS)
 
 mysql-shell:
-	$(COMPOSE_COMMAND) -f $(COMPOSE_FILES) exec -u 0 mysql mysql -hmysql -u$(DATABASE_MYSQL_USER) -D$(DATABASE_MYSQL_NAME) -p$(DATABASE_MYSQL_PASSWORD)
+	$(COMPOSE_COMMAND) -f $(COMPOSE_FILES) exec -u 0 mysql mysql -hmysql -u$(MYSQL_DATABASE_USERNAME) -D$(MYSQL_DATABASE_NAME) -p$(MYSQL_DATABASE_PASSWORD)
 
 redis-shell:
 	$(COMPOSE_COMMAND) -f $(COMPOSE_FILES) exec -u 0 redis redis-cli
