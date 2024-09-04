@@ -42,7 +42,7 @@ func main() {
 	cfg, err := config.Load()
 	if err != nil {
 		kateb.Fatal("failed to load config", map[string]any{
-			"err": err,
+			"err": err.Error(),
 		})
 	}
 
