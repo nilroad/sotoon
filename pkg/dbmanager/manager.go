@@ -37,7 +37,7 @@ func (r *TrxManager) Do(ctx context.Context, fn func(ctx context.Context) error)
 		if err := recover(); err != nil {
 			if err := db.Rollback(); err != nil {
 				r.logger.Error("failed to rollback", map[string]interface{}{
-					"err": err,
+					"err": err.Error(),
 				})
 			}
 			panic(err)

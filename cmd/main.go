@@ -30,6 +30,7 @@ import (
 	"github.com/spf13/cobra"
 	"os/signal"
 	"sotoon/cmd/http"
+	"sotoon/cmd/migration"
 	"sotoon/internal/config"
 	"syscall"
 )
@@ -41,7 +42,7 @@ func main() {
 	cfg, err := config.Load()
 	if err != nil {
 		kateb.Fatal("failed to load config", map[string]any{
-			"err": err,
+			"err": err.Error(),
 		})
 	}
 
@@ -59,10 +60,9 @@ func registerCommands(ctx context.Context, cfg *config.Config) *cobra.Command {
 	root := &cobra.Command{}
 
 	HTTPCmd := new(http.Command)
+	migrateCmd := new(migration.Command)
 
-	root.AddCommand(
-		HTTPCmd.Register(ctx, cfg),
-	)
+	root.AddCommand(HTTPCmd.Register(ctx, cfg), migrateCmd.Register(ctx, cfg))
 
 	return root
 }
