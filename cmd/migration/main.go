@@ -193,8 +193,8 @@ func (r *Command) Step(m *migrate.Migrate, step int) {
 	t := time.Now()
 	if err := m.Steps(step); err != nil {
 		if r.force && errors.As(err, &migrate.ErrDirty{}) {
-			version, _, _ := m.Version() //nolint:all
-			if err := m.Force(int(version) + step - 1); err != nil {
+			version, _, _ := m.Version()                             //nolint:all
+			if err := m.Force(int(version) + step - 1); err != nil { //nolint:all
 				r.logger.Error("failed to force migration", map[string]interface{}{
 					"error": err.Error(),
 				})
