@@ -3,6 +3,7 @@ package migration
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/nilroad/kateb"
@@ -23,6 +24,7 @@ type Command struct {
 	down    bool
 	version bool
 	step    int
+	force   bool
 
 	logger *kateb.Logger
 }
@@ -47,6 +49,7 @@ func (r *Command) Register(ctx context.Context, cfg *config.Config) *cobra.Comma
 	c.Flags().BoolVar(&r.down, "down", false, "migrate down")
 	c.Flags().BoolVar(&r.version, "version", false, "get current version")
 	c.Flags().IntVar(&r.step, "step", 0, "migrate step, negative number for step down and positive for step up")
+	c.Flags().BoolVarP(&r.force, "force", "f", false, "force migration")
 
 	return c
 }
@@ -102,6 +105,15 @@ func (r *Command) run(_ context.Context, cfg *config.Config) {
 			"error": err.Error(),
 		})
 	}
+	defer func() {
+		dErr, sErr := m.Close()
+		if sErr != nil || dErr != nil {
+			r.logger.Error("failed to close database migration connection", map[string]interface{}{
+				"database_error": dErr.Error(),
+				"source_error":   sErr.Error(),
+			})
+		}
+	}()
 
 	if r.up {
 		r.Up(m)
@@ -135,7 +147,21 @@ func (r *Command) Up(m *migrate.Migrate) {
 func (r *Command) Down(m *migrate.Migrate) {
 	t := time.Now()
 	if err := m.Down(); err != nil {
-		r.logger.Error("failed to run migration", map[string]interface{}{
+		if r.force && errors.As(err, &migrate.ErrDirty{}) {
+			if err := m.Force(-1); err != nil {
+				r.logger.Error("failed to force migration", map[string]interface{}{
+					"error": err.Error(),
+				})
+
+				return
+			}
+			r.logger.Info("migration downed successfully", map[string]interface{}{
+				"duration": time.Since(t).String(),
+			})
+
+			return
+		}
+		r.logger.Error("failed to migrate down", map[string]interface{}{
 			"error": err.Error(),
 		})
 
@@ -166,6 +192,23 @@ func (r *Command) Version(m *migrate.Migrate) {
 func (r *Command) Step(m *migrate.Migrate, step int) {
 	t := time.Now()
 	if err := m.Steps(step); err != nil {
+		if r.force && errors.As(err, &migrate.ErrDirty{}) {
+			version, _, _ := m.Version() //nolint:all
+			if err := m.Force(int(version) + step - 1); err != nil {
+				r.logger.Error("failed to force migration", map[string]interface{}{
+					"error": err.Error(),
+				})
+
+				return
+			}
+			r.logger.Info("migration step successfully", map[string]interface{}{
+				"version":  int(version) + step,
+				"duration": time.Since(t),
+			})
+
+			return
+		}
+
 		r.logger.Error("failed to run step on migration", map[string]interface{}{
 			"error": err.Error(),
 			"steps": step,
